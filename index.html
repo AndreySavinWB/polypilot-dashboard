@@ -6,9 +6,9 @@
   <title>PolyPilot Personal Command Center v2</title>
   <style>
     :root {
-      --bg: #05070f;
-      --panel: rgba(11, 18, 36, 0.76);
-      --panel-2: rgba(17, 29, 56, 0.7);
+      --bg: #04060f;
+      --panel: rgba(11, 18, 36, 0.78);
+      --panel-2: rgba(17, 29, 56, 0.72);
       --text: #ebf1ff;
       --muted: #9db3dc;
       --line: rgba(66, 101, 168, 0.45);
@@ -34,41 +34,83 @@
       overflow-x: hidden;
     }
 
-    body::before {
-      content: "";
-      position: fixed;
-      inset: -10px;
-      background-image: url('https://images.unsplash.com/photo-1462331940025-496dfbfc7564?auto=format&fit=crop&w=2200&q=80');
-      background-size: cover;
-      background-position: center;
-      filter: blur(5px) saturate(1.1);
-      transform: scale(1.03);
-      z-index: -3;
-    }
-
-    body::after {
-      content: "";
-      position: fixed;
-      inset: 0;
-      background:
-        radial-gradient(circle at 15% 10%, rgba(67, 240, 255, 0.2), transparent 35%),
-        radial-gradient(circle at 88% 22%, rgba(255, 73, 214, 0.16), transparent 28%),
-        linear-gradient(160deg, rgba(2, 6, 15, 0.86), rgba(3, 8, 20, 0.94));
-      z-index: -2;
-    }
-
+    .bg,
+    .map-layer,
+    .particle-layer,
     .scan {
       position: fixed;
       inset: 0;
       pointer-events: none;
+    }
+
+    .bg {
+      z-index: -4;
+      background:
+        radial-gradient(circle at 12% 18%, rgba(67, 240, 255, 0.16), transparent 34%),
+        radial-gradient(circle at 82% 22%, rgba(255, 73, 214, 0.15), transparent 33%),
+        radial-gradient(circle at 52% 90%, rgba(94, 255, 143, 0.1), transparent 38%),
+        linear-gradient(160deg, rgba(2, 6, 15, 0.97), rgba(4, 10, 24, 0.97));
+      animation: ambientShift 24s ease-in-out infinite alternate;
+    }
+
+    .map-layer {
+      z-index: -3;
+      opacity: 0.55;
+      background:
+        radial-gradient(60% 42% at 50% 52%, rgba(65, 100, 170, 0.12), transparent 72%),
+        radial-gradient(circle at 25% 45%, rgba(67, 240, 255, 0.08) 0 2px, transparent 3px),
+        radial-gradient(circle at 42% 36%, rgba(67, 240, 255, 0.07) 0 2px, transparent 3px),
+        radial-gradient(circle at 61% 52%, rgba(67, 240, 255, 0.07) 0 2px, transparent 3px),
+        radial-gradient(circle at 75% 38%, rgba(67, 240, 255, 0.08) 0 2px, transparent 3px),
+        radial-gradient(circle at 18% 63%, rgba(67, 240, 255, 0.07) 0 2px, transparent 3px),
+        radial-gradient(circle at 67% 68%, rgba(67, 240, 255, 0.07) 0 2px, transparent 3px);
+      filter: blur(0.3px);
+    }
+
+    .map-layer::before,
+    .map-layer::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-repeat: no-repeat;
+    }
+
+    .map-layer::before {
+      background-image:
+        linear-gradient(120deg, transparent 0 46%, rgba(67, 240, 255, 0.16) 50%, transparent 54%),
+        radial-gradient(240px 140px at 24% 44%, rgba(83, 124, 196, 0.13), transparent 72%),
+        radial-gradient(300px 170px at 68% 48%, rgba(83, 124, 196, 0.11), transparent 74%);
+      opacity: 0.5;
+      animation: driftMap 34s linear infinite;
+    }
+
+    .map-layer::after {
+      background-image:
+        radial-gradient(80% 80% at 10% 70%, transparent 45%, rgba(67, 240, 255, 0.17) 46%, transparent 47%),
+        radial-gradient(90% 90% at 80% 25%, transparent 41%, rgba(255, 73, 214, 0.14) 42%, transparent 43%),
+        radial-gradient(75% 75% at 52% 40%, transparent 44%, rgba(67, 240, 255, 0.12) 45%, transparent 46%);
+      opacity: 0.32;
+      animation: arcPulse 16s ease-in-out infinite;
+    }
+
+    .particle-layer {
+      z-index: -2;
+      background-image:
+        radial-gradient(circle at 16% 26%, rgba(67, 240, 255, 0.54) 0 1.2px, transparent 2.2px),
+        radial-gradient(circle at 33% 74%, rgba(67, 240, 255, 0.34) 0 1.2px, transparent 2.2px),
+        radial-gradient(circle at 78% 32%, rgba(255, 73, 214, 0.5) 0 1.5px, transparent 2.3px),
+        radial-gradient(circle at 84% 66%, rgba(94, 255, 143, 0.34) 0 1.3px, transparent 2.2px),
+        radial-gradient(circle at 48% 52%, rgba(67, 240, 255, 0.31) 0 1.1px, transparent 2px);
+      animation: particlesFloat 20s linear infinite;
+      filter: drop-shadow(0 0 6px rgba(67, 240, 255, 0.36));
+    }
+
+    .scan {
       z-index: -1;
-      background: repeating-linear-gradient(
-        to bottom,
-        rgba(255, 255, 255, 0.015),
-        rgba(255, 255, 255, 0.015) 1px,
-        transparent 2px,
-        transparent 4px
-      );
+      background:
+        repeating-linear-gradient(to bottom, rgba(255, 255, 255, 0.018), rgba(255, 255, 255, 0.018) 1px, transparent 2px, transparent 4px),
+        linear-gradient(to bottom, transparent 0%, rgba(67, 240, 255, 0.03) 50%, transparent 100%);
+      animation: scanDrift 9s linear infinite;
     }
 
     .container {
@@ -77,127 +119,67 @@
       padding: 22px 18px 34px;
     }
 
-    h1 {
-      margin: 0;
-      font-size: clamp(1.7rem, 2.6vw, 2.45rem);
-      letter-spacing: 0.05em;
+    .status-line {
+      margin-bottom: 10px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.83rem;
+      color: #b6eac8;
+      letter-spacing: 0.08em;
       text-transform: uppercase;
-      color: var(--neon-cyan);
-      text-shadow: var(--glow-cyan);
+      opacity: 0.9;
+    }
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--ok);
+      box-shadow: 0 0 12px rgba(94, 255, 143, 0.8);
+      animation: blink 1.3s steps(2, end) infinite;
     }
 
-    .subtitle {
-      margin: 6px 0 18px;
-      color: var(--muted);
-      letter-spacing: 0.03em;
-    }
+    h1 { margin: 0; font-size: clamp(1.7rem, 2.6vw, 2.45rem); letter-spacing: 0.05em; text-transform: uppercase; color: var(--neon-cyan); text-shadow: var(--glow-cyan); }
+    .subtitle { margin: 6px 0 18px; color: var(--muted); letter-spacing: 0.03em; }
 
     .panel {
       background: linear-gradient(165deg, rgba(255, 255, 255, 0.04), rgba(67, 240, 255, 0.04));
       border: 1px solid var(--line);
       border-radius: 16px;
-      box-shadow: var(--shadow);
+      box-shadow: var(--shadow), inset 0 0 0 1px rgba(67, 240, 255, 0.08);
       backdrop-filter: blur(10px);
       transition: transform 0.28s ease, border-color 0.28s ease, box-shadow 0.28s ease;
+      animation: terminalFlicker 6s infinite;
     }
+    .panel:hover { transform: translateY(-2px); border-color: rgba(67, 240, 255, 0.68); box-shadow: var(--shadow), var(--glow-cyan); }
 
-    .panel:hover {
-      transform: translateY(-2px);
-      border-color: rgba(67, 240, 255, 0.68);
-      box-shadow: var(--shadow), var(--glow-cyan);
-    }
-
-    .top-grid {
-      display: grid;
-      grid-template-columns: 2fr 1.2fr;
-      gap: 14px;
-      margin-bottom: 14px;
-    }
-
+    .top-grid { display: grid; grid-template-columns: 2fr 1.2fr; gap: 14px; margin-bottom: 14px; }
     .stats, .focus, .progress, .controls, .new-task { padding: 14px; }
+    .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
 
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-    }
-
-    .stat-card {
-      background: var(--panel-2);
-      border: 1px solid rgba(93, 138, 224, 0.45);
-      border-radius: 12px;
-      padding: 10px;
-    }
-
+    .stat-card { background: var(--panel-2); border: 1px solid rgba(93, 138, 224, 0.45); border-radius: 12px; padding: 10px; }
     .stat-label { color: var(--muted); font-size: 0.84rem; }
     .stat-value { font-size: 1.45rem; font-weight: 700; margin-top: 3px; color: var(--neon-lime); text-shadow: 0 0 10px rgba(178,255,63,0.25); }
-
     h2 { margin: 0 0 10px; font-size: 1rem; letter-spacing: 0.06em; color: #e4ecff; text-transform: uppercase; }
 
     .focus ul { margin: 0; padding-left: 18px; color: #e7efff; }
     .focus li { margin: 6px 0; }
-
     .progress-row { margin-bottom: 10px; }
     .progress-meta { display: flex; justify-content: space-between; font-size: 0.82rem; color: var(--muted); margin-bottom: 5px; }
-    .progress-track {
-      width: 100%;
-      height: 10px;
-      border-radius: 999px;
-      background: rgba(31, 45, 80, 0.75);
-      border: 1px solid rgba(96, 133, 198, 0.35);
-      overflow: hidden;
-    }
-    .progress-fill {
-      height: 100%;
-      border-radius: 999px;
-      background: linear-gradient(90deg, var(--neon-cyan), var(--neon-pink));
-      box-shadow: var(--glow-pink);
-      transition: width 0.5s ease;
-    }
+    .progress-track { width: 100%; height: 10px; border-radius: 999px; background: rgba(31, 45, 80, 0.75); border: 1px solid rgba(96, 133, 198, 0.35); overflow: hidden; }
+    .progress-fill { height: 100%; border-radius: 999px; background: linear-gradient(90deg, var(--neon-cyan), var(--neon-pink)); box-shadow: var(--glow-pink); transition: width 0.5s ease; }
 
-    .controls-wrap {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 14px;
-      margin-bottom: 14px;
-    }
-
+    .controls-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
     .controls { display: grid; grid-template-columns: repeat(2, minmax(180px, 260px)); gap: 10px; }
-    .new-task {
-      display: grid;
-      grid-template-columns: 2fr 1fr 1fr 1fr auto;
-      gap: 10px;
-      align-items: end;
-    }
+    .new-task { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr auto; gap: 10px; align-items: end; }
 
     label { font-size: 0.82rem; color: var(--muted); display: block; margin-bottom: 4px; }
-    input, select, button {
-      width: 100%;
-      background: rgba(16, 27, 52, 0.88);
-      color: var(--text);
-      border: 1px solid rgba(83, 124, 196, 0.5);
-      border-radius: 10px;
-      padding: 10px 12px;
-    }
-    input:focus, select:focus {
-      outline: none;
-      border-color: var(--neon-cyan);
-      box-shadow: 0 0 0 3px rgba(67, 240, 255, 0.16);
-    }
-    button {
-      cursor: pointer;
-      font-weight: 600;
-      background: linear-gradient(140deg, rgba(67, 240, 255, 0.2), rgba(255, 73, 214, 0.2));
-      transition: all 0.22s ease;
-    }
+    input, select, button { width: 100%; background: rgba(16, 27, 52, 0.88); color: var(--text); border: 1px solid rgba(83, 124, 196, 0.5); border-radius: 10px; padding: 10px 12px; }
+    input:focus, select:focus { outline: none; border-color: var(--neon-cyan); box-shadow: 0 0 0 3px rgba(67, 240, 255, 0.16); }
+    button { cursor: pointer; font-weight: 600; background: linear-gradient(140deg, rgba(67, 240, 255, 0.2), rgba(255, 73, 214, 0.2)); transition: all 0.22s ease; }
     button:hover { transform: translateY(-1px) scale(1.01); box-shadow: var(--glow-pink); }
 
-    .board {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(240px, 1fr));
-      gap: 12px;
-    }
-
+    .board { display: grid; grid-template-columns: repeat(4, minmax(240px, 1fr)); gap: 12px; }
     .column { padding: 12px; }
     .column h3 { margin: 4px 0 12px; color: var(--neon-lime); letter-spacing: 0.03em; }
     .task-list { display: grid; gap: 10px; }
@@ -209,9 +191,10 @@
       padding: 10px;
       display: grid;
       gap: 8px;
-      transition: all 0.24s ease;
+      transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+      animation: taskEnter 0.45s ease both;
     }
-    .task-card:hover { border-color: rgba(67, 240, 255, 0.85); box-shadow: var(--glow-cyan); transform: translateY(-1px); }
+    .task-card:hover { border-color: rgba(67, 240, 255, 0.85); box-shadow: var(--glow-cyan); transform: translateY(-2px); }
     .task-title { margin: 0; font-size: 0.95rem; }
     .task-done .task-title { text-decoration: line-through; opacity: 0.66; }
     .meta { display: flex; gap: 6px; flex-wrap: wrap; font-size: 0.77rem; }
@@ -219,6 +202,15 @@
     .actions { display: flex; justify-content: space-between; align-items: center; gap: 8px; font-size: 0.84rem; }
     .delete-btn { width: auto; padding: 6px 10px; border-color: rgba(255, 100, 135, 0.7); background: rgba(255, 100, 135, 0.12); color: #ffd8e2; }
     .empty { color: #7389b5; font-size: 0.9rem; }
+
+    @keyframes ambientShift { 0% { transform: scale(1) translateY(0);} 100% { transform: scale(1.04) translateY(-10px);} }
+    @keyframes particlesFloat { 0% { transform: translateY(0) translateX(0);} 50% { transform: translateY(-14px) translateX(8px);} 100% { transform: translateY(0) translateX(0);} }
+    @keyframes scanDrift { 0% { transform: translateY(-8px);} 100% { transform: translateY(8px);} }
+    @keyframes driftMap { 0% { transform: translateX(-1.5%);} 100% { transform: translateX(1.5%);} }
+    @keyframes arcPulse { 0%,100% { opacity: 0.24; } 50% { opacity: 0.42; } }
+    @keyframes terminalFlicker { 0%,100% { opacity: 1; } 49% { opacity: 0.985; } 50% { opacity: 0.965; } 51% { opacity: 0.99; } }
+    @keyframes taskEnter { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes blink { 50% { opacity: 0.2; } }
 
     @media (max-width: 1280px) {
       .top-grid { grid-template-columns: 1fr; }
@@ -236,8 +228,13 @@
   </style>
 </head>
 <body>
+  <div class="bg"></div>
+  <div class="map-layer"></div>
+  <div class="particle-layer"></div>
   <div class="scan"></div>
+
   <div class="container">
+    <div class="status-line"><span class="status-dot"></span>PolyPilot OS online</div>
     <h1>PolyPilot Personal Command Center v2</h1>
     <p class="subtitle">AI Terminal • Cyberpunk • Desktop Operating System</p>
 
@@ -268,62 +265,16 @@
 
     <div class="controls-wrap">
       <div class="panel controls">
-        <div>
-          <label for="categoryFilter">Фильтр по категории</label>
-          <select id="categoryFilter">
-            <option value="all">Все категории</option>
-            <option value="Контент">Контент</option>
-            <option value="Продукт">Продукт</option>
-            <option value="AI Анализ">AI Анализ</option>
-            <option value="Product Vision">Product Vision</option>
-            <option value="Growth System">Growth System</option>
-          </select>
-        </div>
-        <div>
-          <label for="priorityFilter">Фильтр по приоритету</label>
-          <select id="priorityFilter">
-            <option value="all">Все приоритеты</option>
-            <option value="высокий">Высокий</option>
-            <option value="средний">Средний</option>
-            <option value="низкий">Низкий</option>
-          </select>
-        </div>
+        <div><label for="categoryFilter">Фильтр по категории</label><select id="categoryFilter"><option value="all">Все категории</option><option value="Контент">Контент</option><option value="Продукт">Продукт</option><option value="AI Анализ">AI Анализ</option><option value="Product Vision">Product Vision</option><option value="Growth System">Growth System</option></select></div>
+        <div><label for="priorityFilter">Фильтр по приоритету</label><select id="priorityFilter"><option value="all">Все приоритеты</option><option value="высокий">Высокий</option><option value="средний">Средний</option><option value="низкий">Низкий</option></select></div>
       </div>
 
       <div class="panel new-task">
-        <div class="wide">
-          <label for="taskTitle">Задача</label>
-          <input id="taskTitle" placeholder="Введите задачу" />
-        </div>
-        <div>
-          <label for="taskCategory">Категория</label>
-          <select id="taskCategory">
-            <option value="Контент">Контент</option>
-            <option value="Продукт">Продукт</option>
-            <option value="AI Анализ">AI Анализ</option>
-            <option value="Product Vision">Product Vision</option>
-            <option value="Growth System">Growth System</option>
-          </select>
-        </div>
-        <div>
-          <label for="taskPriority">Приоритет</label>
-          <select id="taskPriority">
-            <option value="высокий">Высокий</option>
-            <option value="средний" selected>Средний</option>
-            <option value="низкий">Низкий</option>
-          </select>
-        </div>
-        <div>
-          <label for="taskColumn">Колонка</label>
-          <select id="taskColumn">
-            <option value="Сегодня">Сегодня</option>
-            <option value="Неделя">Неделя</option>
-            <option value="Когда-нибудь потом">Когда-нибудь потом</option>
-          </select>
-        </div>
-        <div>
-          <button id="addTaskBtn">Добавить</button>
-        </div>
+        <div class="wide"><label for="taskTitle">Задача</label><input id="taskTitle" placeholder="Введите задачу" /></div>
+        <div><label for="taskCategory">Категория</label><select id="taskCategory"><option value="Контент">Контент</option><option value="Продукт">Продукт</option><option value="AI Анализ">AI Анализ</option><option value="Product Vision">Product Vision</option><option value="Growth System">Growth System</option></select></div>
+        <div><label for="taskPriority">Приоритет</label><select id="taskPriority"><option value="высокий">Высокий</option><option value="средний" selected>Средний</option><option value="низкий">Низкий</option></select></div>
+        <div><label for="taskColumn">Колонка</label><select id="taskColumn"><option value="Сегодня">Сегодня</option><option value="Неделя">Неделя</option><option value="Когда-нибудь потом">Когда-нибудь потом</option></select></div>
+        <div><button id="addTaskBtn">Добавить</button></div>
       </div>
     </div>
 
@@ -333,7 +284,6 @@
   <script>
     const STORAGE_KEY = 'polypilot-dashboard-v2';
     const COLUMNS = ['Сегодня', 'Неделя', 'Когда-нибудь потом', 'ГОТОВО'];
-
     const starterTasks = [
       { title: 'сделать 1 ролик', category: 'Контент', priority: 'высокий', done: false, column: 'Сегодня' },
       { title: 'добавить идею в MVP dashboard', category: 'Продукт', priority: 'высокий', done: false, column: 'Сегодня' },
@@ -341,7 +291,6 @@
       { title: 'обновить product vision заметки', category: 'Product Vision', priority: 'средний', done: false, column: 'Неделя' },
       { title: 'система роста: 3 гипотезы', category: 'Growth System', priority: 'низкий', done: false, column: 'Когда-нибудь потом' }
     ];
-
     const progressData = [
       { name: 'Контент', value: 68 },
       { name: 'MVP Dashboard', value: 74 },
@@ -353,7 +302,6 @@
     const boardEl = document.getElementById('board');
     const categoryFilterEl = document.getElementById('categoryFilter');
     const priorityFilterEl = document.getElementById('priorityFilter');
-
     let tasks = loadTasks();
 
     function loadTasks() {
@@ -363,16 +311,10 @@
         localStorage.setItem(STORAGE_KEY, JSON.stringify(initial));
         return initial;
       }
-      try {
-        return JSON.parse(saved);
-      } catch {
-        return [];
-      }
+      try { return JSON.parse(saved); } catch { return []; }
     }
 
-    function saveTasks() {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
-    }
+    function saveTasks() { localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks)); }
 
     function addTask() {
       const title = document.getElementById('taskTitle').value.trim();
@@ -380,34 +322,21 @@
       const priority = document.getElementById('taskPriority').value;
       const column = document.getElementById('taskColumn').value;
       if (!title) return;
-
       tasks.unshift({ id: crypto.randomUUID(), title, category, priority, done: false, column });
-      saveTasks();
-      render();
-      document.getElementById('taskTitle').value = '';
+      saveTasks(); render(); document.getElementById('taskTitle').value = '';
     }
 
-    function deleteTask(id) {
-      tasks = tasks.filter(task => task.id !== id);
-      saveTasks();
-      render();
-    }
+    function deleteTask(id) { tasks = tasks.filter(task => task.id !== id); saveTasks(); render(); }
 
     function toggleTask(id) {
-      tasks = tasks.map(task => {
-        if (task.id !== id) return task;
-        const done = !task.done;
-        return { ...task, done, column: done ? 'ГОТОВО' : 'Сегодня' };
-      });
-      saveTasks();
-      render();
+      tasks = tasks.map(task => task.id !== id ? task : { ...task, done: !task.done, column: !task.done ? 'ГОТОВО' : 'Сегодня' });
+      saveTasks(); render();
     }
 
     function updateCounters() {
       const completed = tasks.filter(task => task.done).length;
       const active = tasks.length - completed;
       const streak = Math.max(1, completed) + Math.floor(active / 3);
-
       document.getElementById('tasksCompleted').textContent = completed;
       document.getElementById('activeTasks').textContent = active;
       document.getElementById('currentStreak').textContent = `${streak}d`;
@@ -419,10 +348,7 @@
       progressData.forEach(item => {
         const row = document.createElement('div');
         row.className = 'progress-row';
-        row.innerHTML = `
-          <div class="progress-meta"><span>${item.name}</span><span>${item.value}%</span></div>
-          <div class="progress-track"><div class="progress-fill" style="width:${item.value}%"></div></div>
-        `;
+        row.innerHTML = `<div class="progress-meta"><span>${item.name}</span><span>${item.value}%</span></div><div class="progress-track"><div class="progress-fill" style="width:${item.value}%"></div></div>`;
         list.appendChild(row);
       });
     }
@@ -430,11 +356,7 @@
     function filterTasks(list) {
       const categoryFilter = categoryFilterEl.value;
       const priorityFilter = priorityFilterEl.value;
-      return list.filter(task => {
-        const categoryOk = categoryFilter === 'all' || task.category === categoryFilter;
-        const priorityOk = priorityFilter === 'all' || task.priority === priorityFilter;
-        return categoryOk && priorityOk;
-      });
+      return list.filter(task => (categoryFilter === 'all' || task.category === categoryFilter) && (priorityFilter === 'all' || task.priority === priorityFilter));
     }
 
     function render() {
@@ -444,14 +366,10 @@
       COLUMNS.forEach((columnName) => {
         const column = document.createElement('section');
         column.className = 'panel column';
-
-        const title = document.createElement('h3');
-        title.textContent = columnName;
-        column.appendChild(title);
+        column.innerHTML = `<h3>${columnName}</h3>`;
 
         const taskList = document.createElement('div');
         taskList.className = 'task-list';
-
         const columnTasks = visible.filter(task => task.column === columnName);
 
         if (!columnTasks.length) {
@@ -461,20 +379,11 @@
           taskList.appendChild(empty);
         }
 
-        columnTasks.forEach((task) => {
+        columnTasks.forEach((task, index) => {
           const card = document.createElement('article');
           card.className = `task-card ${task.done ? 'task-done' : ''}`;
-          card.innerHTML = `
-            <p class="task-title">${task.title}</p>
-            <div class="meta">
-              <span class="badge">${task.category}</span>
-              <span class="badge">${task.priority}</span>
-            </div>
-            <div class="actions">
-              <label><input type="checkbox" data-action="toggle" data-id="${task.id}" ${task.done ? 'checked' : ''}> готово</label>
-              <button class="delete-btn" data-action="delete" data-id="${task.id}">Удалить</button>
-            </div>
-          `;
+          card.style.animationDelay = `${Math.min(index * 55, 220)}ms`;
+          card.innerHTML = `<p class="task-title">${task.title}</p><div class="meta"><span class="badge">${task.category}</span><span class="badge">${task.priority}</span></div><div class="actions"><label><input type="checkbox" data-action="toggle" data-id="${task.id}" ${task.done ? 'checked' : ''}> готово</label><button class="delete-btn" data-action="delete" data-id="${task.id}">Удалить</button></div>`;
           taskList.appendChild(card);
         });
 
@@ -489,17 +398,8 @@
     document.getElementById('taskTitle').addEventListener('keydown', (e) => { if (e.key === 'Enter') addTask(); });
     categoryFilterEl.addEventListener('change', render);
     priorityFilterEl.addEventListener('change', render);
-
-    boardEl.addEventListener('click', (e) => {
-      const action = e.target.dataset.action;
-      const id = e.target.dataset.id;
-      if (!action || !id) return;
-      if (action === 'delete') deleteTask(id);
-    });
-
-    boardEl.addEventListener('change', (e) => {
-      if (e.target.dataset.action === 'toggle') toggleTask(e.target.dataset.id);
-    });
+    boardEl.addEventListener('click', (e) => { const action = e.target.dataset.action; const id = e.target.dataset.id; if (action === 'delete' && id) deleteTask(id); });
+    boardEl.addEventListener('change', (e) => { if (e.target.dataset.action === 'toggle') toggleTask(e.target.dataset.id); });
 
     renderProgress();
     render();
