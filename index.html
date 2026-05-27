@@ -262,7 +262,7 @@
     </section>
 
     <section class="panel progress" id="progressBlock">
-      <h2>MVP Progress</h2>
+      <h2>50-дневный спринт до MVP</h2>
       <div id="progressList"></div>
     </section>
 
@@ -272,11 +272,10 @@
           <label for="categoryFilter">Фильтр по категории</label>
           <select id="categoryFilter">
             <option value="all">Все категории</option>
-            <option value="Контент">Контент</option>
-            <option value="Продукт">Продукт</option>
-            <option value="AI Анализ">AI Анализ</option>
-            <option value="Product Vision">Product Vision</option>
-            <option value="Growth System">Growth System</option>
+            <option value="Разработка">Разработка</option>
+            <option value="Дизайн">Дизайн</option>
+            <option value="Маркетинг">Маркетинг</option>
+            <option value="Операционка">Операционка</option>
           </select>
         </div>
         <div>
@@ -298,11 +297,10 @@
         <div>
           <label for="taskCategory">Категория</label>
           <select id="taskCategory">
-            <option value="Контент">Контент</option>
-            <option value="Продукт">Продукт</option>
-            <option value="AI Анализ">AI Анализ</option>
-            <option value="Product Vision">Product Vision</option>
-            <option value="Growth System">Growth System</option>
+            <option value="Разработка">Разработка</option>
+            <option value="Дизайн">Дизайн</option>
+            <option value="Маркетинг">Маркетинг</option>
+            <option value="Операционка">Операционка</option>
           </select>
         </div>
         <div>
@@ -335,20 +333,12 @@
     const COLUMNS = ['Сегодня', 'Неделя', 'Когда-нибудь потом', 'ГОТОВО'];
 
     const starterTasks = [
-      { title: 'сделать 1 ролик', category: 'Контент', priority: 'высокий', done: false, column: 'Сегодня' },
-      { title: 'добавить идею в MVP dashboard', category: 'Продукт', priority: 'высокий', done: false, column: 'Сегодня' },
-      { title: '30 минут изучения AI', category: 'AI Анализ', priority: 'средний', done: false, column: 'Неделя' },
-      { title: 'обновить product vision заметки', category: 'Product Vision', priority: 'средний', done: false, column: 'Неделя' },
-      { title: 'система роста: 3 гипотезы', category: 'Growth System', priority: 'низкий', done: false, column: 'Когда-нибудь потом' }
+      { title: 'Поднять первую версию MVP-экрана', category: 'Разработка', priority: 'высокий', done: false, column: 'Сегодня', completedAt: null },
+      { title: 'Протестировать новый onboarding flow', category: 'Дизайн', priority: 'средний', done: false, column: 'Неделя', completedAt: null },
+      { title: 'Записать гипотезу value proposition', category: 'Маркетинг', priority: 'средний', done: false, column: 'Неделя', completedAt: null },
+      { title: 'Обновить backlog спринта', category: 'Операционка', priority: 'низкий', done: false, column: 'Когда-нибудь потом', completedAt: null }
     ];
-
-    const progressData = [
-      { name: 'Контент', value: 68 },
-      { name: 'MVP Dashboard', value: 74 },
-      { name: 'AI Анализ', value: 55 },
-      { name: 'Product Vision', value: 61 },
-      { name: 'Growth System', value: 42 }
-    ];
+    const SPRINT_DAYS = 50;
 
     const boardEl = document.getElementById('board');
     const categoryFilterEl = document.getElementById('categoryFilter');
@@ -364,7 +354,7 @@
         return initial;
       }
       try {
-        return JSON.parse(saved);
+        return JSON.parse(saved).map(normalizeTask);
       } catch {
         return [];
       }
@@ -381,7 +371,7 @@
       const column = document.getElementById('taskColumn').value;
       if (!title) return;
 
-      tasks.unshift({ id: crypto.randomUUID(), title, category, priority, done: false, column });
+      tasks.unshift({ id: crypto.randomUUID(), title, category, priority, done: false, column, completedAt: null });
       saveTasks();
       render();
       document.getElementById('taskTitle').value = '';
@@ -397,7 +387,7 @@
       tasks = tasks.map(task => {
         if (task.id !== id) return task;
         const done = !task.done;
-        return { ...task, done, column: done ? 'ГОТОВО' : 'Сегодня' };
+        return { ...task, done, column: done ? 'ГОТОВО' : 'Сегодня', completedAt: done ? new Date().toISOString() : null };
       });
       saveTasks();
       render();
@@ -406,7 +396,7 @@
     function updateCounters() {
       const completed = tasks.filter(task => task.done).length;
       const active = tasks.length - completed;
-      const streak = Math.max(1, completed) + Math.floor(active / 3);
+      const streak = getCurrentStreak();
 
       document.getElementById('tasksCompleted').textContent = completed;
       document.getElementById('activeTasks').textContent = active;
@@ -415,16 +405,50 @@
 
     function renderProgress() {
       const list = document.getElementById('progressList');
-      list.innerHTML = '';
-      progressData.forEach(item => {
-        const row = document.createElement('div');
-        row.className = 'progress-row';
-        row.innerHTML = `
-          <div class="progress-meta"><span>${item.name}</span><span>${item.value}%</span></div>
-          <div class="progress-track"><div class="progress-fill" style="width:${item.value}%"></div></div>
-        `;
-        list.appendChild(row);
-      });
+      const activeDays = getActiveDays();
+      const dayNumber = Math.max(1, Math.min(SPRINT_DAYS, activeDays.length));
+      const daysLeft = Math.max(0, SPRINT_DAYS - dayNumber);
+      const progressPercent = Math.round((dayNumber / SPRINT_DAYS) * 100);
+      const completedTasks = tasks.filter(task => task.done).length;
+      const streak = getCurrentStreak();
+
+      list.innerHTML = `
+        <div class="progress-row">
+          <div class="progress-meta"><span>День ${dayNumber} / ${SPRINT_DAYS}</span><span>${progressPercent}%</span></div>
+          <div class="progress-track"><div class="progress-fill" style="width:${progressPercent}%"></div></div>
+        </div>
+        <div class="progress-meta"><span>Осталось ${daysLeft} дней</span><span>Текущий streak: ${streak}d</span></div>
+        <div class="progress-meta"><span>Всего выполнено задач: ${completedTasks}</span></div>
+        <p style="margin:10px 0 0;color:var(--muted);font-size:0.85rem;">Цель: 50 дней подряд двигать PolyPilot к MVP. Не идеально. Ежедневно.</p>
+      `;
+    }
+
+    function normalizeTask(task) {
+      return {
+        ...task,
+        completedAt: task.completedAt ?? null
+      };
+    }
+
+    function getDateKey(dateInput) {
+      return new Date(dateInput).toISOString().slice(0, 10);
+    }
+
+    function getActiveDays() {
+      return [...new Set(tasks.filter(task => task.done && task.completedAt).map(task => getDateKey(task.completedAt)))].sort();
+    }
+
+    function getCurrentStreak() {
+      const daySet = new Set(getActiveDays());
+      let streak = 0;
+      const cursor = new Date();
+      cursor.setUTCHours(0, 0, 0, 0);
+
+      while (daySet.has(cursor.toISOString().slice(0, 10))) {
+        streak += 1;
+        cursor.setUTCDate(cursor.getUTCDate() - 1);
+      }
+      return streak;
     }
 
     function filterTasks(list) {
@@ -483,6 +507,7 @@
       });
 
       updateCounters();
+      renderProgress();
     }
 
     document.getElementById('addTaskBtn').addEventListener('click', addTask);
@@ -501,7 +526,6 @@
       if (e.target.dataset.action === 'toggle') toggleTask(e.target.dataset.id);
     });
 
-    renderProgress();
     render();
   </script>
 </body>
