@@ -3,20 +3,23 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PolyPilot Dashboard</title>
+  <title>PolyPilot Personal Command Center v2</title>
   <style>
     :root {
-      --bg: #070b14;
-      --panel: #10182a;
-      --panel-2: #121d33;
-      --text: #e8eeff;
-      --muted: #9eb0d8;
-      --line: #25375f;
-      --neon-cyan: #1de9ff;
-      --neon-pink: #ff4dd2;
-      --neon-lime: #b7ff4a;
-      --danger: #ff5b77;
-      --shadow: 0 0 0 1px rgba(29, 233, 255, 0.18), 0 10px 30px rgba(0, 0, 0, 0.45);
+      --bg: #05070f;
+      --panel: rgba(11, 18, 36, 0.76);
+      --panel-2: rgba(17, 29, 56, 0.7);
+      --text: #ebf1ff;
+      --muted: #9db3dc;
+      --line: rgba(66, 101, 168, 0.45);
+      --neon-cyan: #43f0ff;
+      --neon-pink: #ff49d6;
+      --neon-lime: #b2ff3f;
+      --danger: #ff6487;
+      --ok: #5eff8f;
+      --glow-cyan: 0 0 22px rgba(67, 240, 255, 0.34);
+      --glow-pink: 0 0 24px rgba(255, 73, 214, 0.28);
+      --shadow: 0 12px 30px rgba(0, 0, 0, 0.45);
     }
 
     * { box-sizing: border-box; }
@@ -24,208 +27,303 @@
     body {
       margin: 0;
       font-family: Inter, Segoe UI, Roboto, sans-serif;
-      background: radial-gradient(circle at 20% 10%, #17284a 0%, var(--bg) 45%), var(--bg);
       color: var(--text);
       min-height: 100vh;
+      background-color: var(--bg);
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: -10px;
+      background-image: url('https://images.unsplash.com/photo-1462331940025-496dfbfc7564?auto=format&fit=crop&w=2200&q=80');
+      background-size: cover;
+      background-position: center;
+      filter: blur(5px) saturate(1.1);
+      transform: scale(1.03);
+      z-index: -3;
+    }
+
+    body::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(circle at 15% 10%, rgba(67, 240, 255, 0.2), transparent 35%),
+        radial-gradient(circle at 88% 22%, rgba(255, 73, 214, 0.16), transparent 28%),
+        linear-gradient(160deg, rgba(2, 6, 15, 0.86), rgba(3, 8, 20, 0.94));
+      z-index: -2;
+    }
+
+    .scan {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: -1;
+      background: repeating-linear-gradient(
+        to bottom,
+        rgba(255, 255, 255, 0.015),
+        rgba(255, 255, 255, 0.015) 1px,
+        transparent 2px,
+        transparent 4px
+      );
     }
 
     .container {
-      max-width: 1200px;
+      width: min(1600px, 95vw);
       margin: 0 auto;
-      padding: 28px 20px 36px;
+      padding: 22px 18px 34px;
     }
 
     h1 {
-      margin: 0 0 18px;
-      font-size: clamp(1.5rem, 2vw, 2rem);
+      margin: 0;
+      font-size: clamp(1.7rem, 2.6vw, 2.45rem);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
       color: var(--neon-cyan);
-      text-shadow: 0 0 12px rgba(29, 233, 255, 0.45);
+      text-shadow: var(--glow-cyan);
     }
 
-    .controls, .new-task {
-      background: linear-gradient(160deg, rgba(255, 255, 255, 0.02), rgba(29, 233, 255, 0.04));
+    .subtitle {
+      margin: 6px 0 18px;
+      color: var(--muted);
+      letter-spacing: 0.03em;
+    }
+
+    .panel {
+      background: linear-gradient(165deg, rgba(255, 255, 255, 0.04), rgba(67, 240, 255, 0.04));
       border: 1px solid var(--line);
-      border-radius: 14px;
-      padding: 14px;
+      border-radius: 16px;
       box-shadow: var(--shadow);
-      margin-bottom: 16px;
+      backdrop-filter: blur(10px);
+      transition: transform 0.28s ease, border-color 0.28s ease, box-shadow 0.28s ease;
     }
 
-    .controls {
+    .panel:hover {
+      transform: translateY(-2px);
+      border-color: rgba(67, 240, 255, 0.68);
+      box-shadow: var(--shadow), var(--glow-cyan);
+    }
+
+    .top-grid {
       display: grid;
-      grid-template-columns: repeat(2, minmax(180px, 240px));
+      grid-template-columns: 2fr 1.2fr;
+      gap: 14px;
+      margin-bottom: 14px;
+    }
+
+    .stats, .focus, .progress, .controls, .new-task { padding: 14px; }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
       gap: 10px;
     }
 
+    .stat-card {
+      background: var(--panel-2);
+      border: 1px solid rgba(93, 138, 224, 0.45);
+      border-radius: 12px;
+      padding: 10px;
+    }
+
+    .stat-label { color: var(--muted); font-size: 0.84rem; }
+    .stat-value { font-size: 1.45rem; font-weight: 700; margin-top: 3px; color: var(--neon-lime); text-shadow: 0 0 10px rgba(178,255,63,0.25); }
+
+    h2 { margin: 0 0 10px; font-size: 1rem; letter-spacing: 0.06em; color: #e4ecff; text-transform: uppercase; }
+
+    .focus ul { margin: 0; padding-left: 18px; color: #e7efff; }
+    .focus li { margin: 6px 0; }
+
+    .progress-row { margin-bottom: 10px; }
+    .progress-meta { display: flex; justify-content: space-between; font-size: 0.82rem; color: var(--muted); margin-bottom: 5px; }
+    .progress-track {
+      width: 100%;
+      height: 10px;
+      border-radius: 999px;
+      background: rgba(31, 45, 80, 0.75);
+      border: 1px solid rgba(96, 133, 198, 0.35);
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--neon-cyan), var(--neon-pink));
+      box-shadow: var(--glow-pink);
+      transition: width 0.5s ease;
+    }
+
+    .controls-wrap {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-bottom: 14px;
+    }
+
+    .controls { display: grid; grid-template-columns: repeat(2, minmax(180px, 260px)); gap: 10px; }
     .new-task {
       display: grid;
       grid-template-columns: 2fr 1fr 1fr 1fr auto;
       gap: 10px;
-      align-items: center;
+      align-items: end;
     }
 
-    label { font-size: 0.85rem; color: var(--muted); display:block; margin-bottom: 4px; }
-
+    label { font-size: 0.82rem; color: var(--muted); display: block; margin-bottom: 4px; }
     input, select, button {
       width: 100%;
-      background: var(--panel-2);
+      background: rgba(16, 27, 52, 0.88);
       color: var(--text);
-      border: 1px solid var(--line);
+      border: 1px solid rgba(83, 124, 196, 0.5);
       border-radius: 10px;
       padding: 10px 12px;
-      font-size: 0.95rem;
     }
-
     input:focus, select:focus {
       outline: none;
       border-color: var(--neon-cyan);
-      box-shadow: 0 0 0 2px rgba(29, 233, 255, 0.2);
+      box-shadow: 0 0 0 3px rgba(67, 240, 255, 0.16);
     }
-
     button {
       cursor: pointer;
-      border-color: rgba(255, 77, 210, 0.6);
-      background: linear-gradient(135deg, rgba(29, 233, 255, 0.18), rgba(255, 77, 210, 0.18));
-      color: #fff;
       font-weight: 600;
-      transition: 0.2s ease;
+      background: linear-gradient(140deg, rgba(67, 240, 255, 0.2), rgba(255, 73, 214, 0.2));
+      transition: all 0.22s ease;
     }
-
-    button:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(255, 77, 210, 0.25); }
+    button:hover { transform: translateY(-1px) scale(1.01); box-shadow: var(--glow-pink); }
 
     .board {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 14px;
+      grid-template-columns: repeat(4, minmax(240px, 1fr));
+      gap: 12px;
     }
 
-    .column {
-      background: linear-gradient(170deg, rgba(29, 233, 255, 0.07), rgba(183, 255, 74, 0.04));
-      border: 1px solid var(--line);
-      border-radius: 16px;
-      min-height: 280px;
-      box-shadow: var(--shadow);
-      padding: 12px;
-    }
-
-    .column h2 {
-      margin: 6px 0 12px;
-      font-size: 1rem;
-      letter-spacing: 0.5px;
-      color: var(--neon-lime);
-    }
-
+    .column { padding: 12px; }
+    .column h3 { margin: 4px 0 12px; color: var(--neon-lime); letter-spacing: 0.03em; }
     .task-list { display: grid; gap: 10px; }
 
     .task-card {
       background: var(--panel);
-      border: 1px solid #293b67;
+      border: 1px solid rgba(83, 124, 196, 0.48);
       border-radius: 12px;
       padding: 10px;
       display: grid;
       gap: 8px;
+      transition: all 0.24s ease;
     }
-
+    .task-card:hover { border-color: rgba(67, 240, 255, 0.85); box-shadow: var(--glow-cyan); transform: translateY(-1px); }
     .task-title { margin: 0; font-size: 0.95rem; }
-    .task-done .task-title { text-decoration: line-through; opacity: 0.6; }
+    .task-done .task-title { text-decoration: line-through; opacity: 0.66; }
+    .meta { display: flex; gap: 6px; flex-wrap: wrap; font-size: 0.77rem; }
+    .badge { padding: 2px 8px; border-radius: 999px; border: 1px solid rgba(95, 140, 218, 0.6); background: rgba(20, 34, 66, 0.86); color: #cce2ff; }
+    .actions { display: flex; justify-content: space-between; align-items: center; gap: 8px; font-size: 0.84rem; }
+    .delete-btn { width: auto; padding: 6px 10px; border-color: rgba(255, 100, 135, 0.7); background: rgba(255, 100, 135, 0.12); color: #ffd8e2; }
+    .empty { color: #7389b5; font-size: 0.9rem; }
 
-    .meta {
-      display: flex;
-      gap: 6px;
-      flex-wrap: wrap;
-      font-size: 0.78rem;
-      color: var(--muted);
-    }
-
-    .badge {
-      padding: 2px 8px;
-      border-radius: 999px;
-      border: 1px solid #355089;
-      background: #0f1b34;
-    }
-
-    .actions { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
-
-    .delete-btn {
-      width: auto;
-      padding: 6px 10px;
-      background: rgba(255, 91, 119, 0.15);
-      border-color: rgba(255, 91, 119, 0.5);
-      color: #ffd9e1;
-    }
-
-    .empty {
-      color: #6f82ad;
-      font-size: 0.9rem;
-      padding: 8px 2px;
-    }
-
-    @media (max-width: 1024px) {
+    @media (max-width: 1280px) {
+      .top-grid { grid-template-columns: 1fr; }
+      .controls-wrap { grid-template-columns: 1fr; }
       .new-task { grid-template-columns: 1fr 1fr; }
-      .new-task .add-btn { grid-column: span 2; }
+      .new-task .wide { grid-column: span 2; }
+      .board { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 860px) {
+      .stats-grid { grid-template-columns: 1fr; }
       .controls { grid-template-columns: 1fr; }
       .board { grid-template-columns: 1fr; }
     }
   </style>
 </head>
 <body>
+  <div class="scan"></div>
   <div class="container">
-    <h1>PolyPilot — Dark Dashboard</h1>
+    <h1>PolyPilot Personal Command Center v2</h1>
+    <p class="subtitle">AI Terminal • Cyberpunk • Desktop Operating System</p>
 
-    <div class="controls">
-      <div>
-        <label for="categoryFilter">Фильтр по категории</label>
-        <select id="categoryFilter">
-          <option value="all">Все категории</option>
-          <option value="Контент">Контент</option>
-          <option value="Продукт">Продукт</option>
-          <option value="Интеллект">Интеллект</option>
-          <option value="Техника">Техника</option>
-        </select>
+    <section class="top-grid">
+      <div class="panel stats">
+        <h2>Metrics</h2>
+        <div class="stats-grid">
+          <div class="stat-card"><div class="stat-label">Tasks completed</div><div class="stat-value" id="tasksCompleted">0</div></div>
+          <div class="stat-card"><div class="stat-label">Current streak</div><div class="stat-value" id="currentStreak">0</div></div>
+          <div class="stat-card"><div class="stat-label">Active tasks</div><div class="stat-value" id="activeTasks">0</div></div>
+        </div>
       </div>
-      <div>
-        <label for="priorityFilter">Фильтр по приоритету</label>
-        <select id="priorityFilter">
-          <option value="all">Все приоритеты</option>
-          <option value="высокий">Высокий</option>
-          <option value="средний">Средний</option>
-          <option value="низкий">Низкий</option>
-        </select>
+      <div class="panel focus">
+        <h2>Сегодняшний фокус</h2>
+        <ul>
+          <li>1 ролик</li>
+          <li>30 мин AI</li>
+          <li>1 идея</li>
+          <li>1 улучшение dashboard</li>
+        </ul>
       </div>
-    </div>
+    </section>
 
-    <div class="new-task">
-      <div>
-        <label for="taskTitle">Задача</label>
-        <input id="taskTitle" placeholder="Введите задачу" />
+    <section class="panel progress" id="progressBlock">
+      <h2>MVP Progress</h2>
+      <div id="progressList"></div>
+    </section>
+
+    <div class="controls-wrap">
+      <div class="panel controls">
+        <div>
+          <label for="categoryFilter">Фильтр по категории</label>
+          <select id="categoryFilter">
+            <option value="all">Все категории</option>
+            <option value="Контент">Контент</option>
+            <option value="Продукт">Продукт</option>
+            <option value="AI Анализ">AI Анализ</option>
+            <option value="Product Vision">Product Vision</option>
+            <option value="Growth System">Growth System</option>
+          </select>
+        </div>
+        <div>
+          <label for="priorityFilter">Фильтр по приоритету</label>
+          <select id="priorityFilter">
+            <option value="all">Все приоритеты</option>
+            <option value="высокий">Высокий</option>
+            <option value="средний">Средний</option>
+            <option value="низкий">Низкий</option>
+          </select>
+        </div>
       </div>
-      <div>
-        <label for="taskCategory">Категория</label>
-        <select id="taskCategory">
-          <option value="Контент">Контент</option>
-          <option value="Продукт">Продукт</option>
-          <option value="Интеллект">Интеллект</option>
-          <option value="Техника">Техника</option>
-        </select>
-      </div>
-      <div>
-        <label for="taskPriority">Приоритет</label>
-        <select id="taskPriority">
-          <option value="высокий">Высокий</option>
-          <option value="средний" selected>Средний</option>
-          <option value="низкий">Низкий</option>
-        </select>
-      </div>
-      <div>
-        <label for="taskColumn">Колонка</label>
-        <select id="taskColumn">
-          <option value="Сегодня">Сегодня</option>
-          <option value="Неделя">Неделя</option>
-          <option value="Когда-нибудь потом">Когда-нибудь потом</option>
-        </select>
-      </div>
-      <div class="add-btn" style="align-self:end;">
-        <button id="addTaskBtn">Добавить</button>
+
+      <div class="panel new-task">
+        <div class="wide">
+          <label for="taskTitle">Задача</label>
+          <input id="taskTitle" placeholder="Введите задачу" />
+        </div>
+        <div>
+          <label for="taskCategory">Категория</label>
+          <select id="taskCategory">
+            <option value="Контент">Контент</option>
+            <option value="Продукт">Продукт</option>
+            <option value="AI Анализ">AI Анализ</option>
+            <option value="Product Vision">Product Vision</option>
+            <option value="Growth System">Growth System</option>
+          </select>
+        </div>
+        <div>
+          <label for="taskPriority">Приоритет</label>
+          <select id="taskPriority">
+            <option value="высокий">Высокий</option>
+            <option value="средний" selected>Средний</option>
+            <option value="низкий">Низкий</option>
+          </select>
+        </div>
+        <div>
+          <label for="taskColumn">Колонка</label>
+          <select id="taskColumn">
+            <option value="Сегодня">Сегодня</option>
+            <option value="Неделя">Неделя</option>
+            <option value="Когда-нибудь потом">Когда-нибудь потом</option>
+          </select>
+        </div>
+        <div>
+          <button id="addTaskBtn">Добавить</button>
+        </div>
       </div>
     </div>
 
@@ -233,15 +331,23 @@
   </div>
 
   <script>
-    const STORAGE_KEY = 'polypilot-dashboard-v1';
-    const COLUMNS = ['Сегодня', 'Неделя', 'Когда-нибудь потом'];
+    const STORAGE_KEY = 'polypilot-dashboard-v2';
+    const COLUMNS = ['Сегодня', 'Неделя', 'Когда-нибудь потом', 'ГОТОВО'];
 
     const starterTasks = [
       { title: 'сделать 1 ролик', category: 'Контент', priority: 'высокий', done: false, column: 'Сегодня' },
-      { title: 'изучить 1 событие Polymarket', category: 'Интеллект', priority: 'средний', done: false, column: 'Неделя' },
       { title: 'добавить идею в MVP dashboard', category: 'Продукт', priority: 'высокий', done: false, column: 'Сегодня' },
-      { title: '30 минут изучения AI', category: 'Интеллект', priority: 'средний', done: false, column: 'Неделя' },
-      { title: 'опубликовать пост в Telegram', category: 'Контент', priority: 'низкий', done: false, column: 'Когда-нибудь потом' }
+      { title: '30 минут изучения AI', category: 'AI Анализ', priority: 'средний', done: false, column: 'Неделя' },
+      { title: 'обновить product vision заметки', category: 'Product Vision', priority: 'средний', done: false, column: 'Неделя' },
+      { title: 'система роста: 3 гипотезы', category: 'Growth System', priority: 'низкий', done: false, column: 'Когда-нибудь потом' }
+    ];
+
+    const progressData = [
+      { name: 'Контент', value: 68 },
+      { name: 'MVP Dashboard', value: 74 },
+      { name: 'AI Анализ', value: 55 },
+      { name: 'Product Vision', value: 61 },
+      { name: 'Growth System', value: 42 }
     ];
 
     const boardEl = document.getElementById('board');
@@ -273,7 +379,6 @@
       const category = document.getElementById('taskCategory').value;
       const priority = document.getElementById('taskPriority').value;
       const column = document.getElementById('taskColumn').value;
-
       if (!title) return;
 
       tasks.unshift({ id: crypto.randomUUID(), title, category, priority, done: false, column });
@@ -289,9 +394,37 @@
     }
 
     function toggleTask(id) {
-      tasks = tasks.map(task => task.id === id ? { ...task, done: !task.done } : task);
+      tasks = tasks.map(task => {
+        if (task.id !== id) return task;
+        const done = !task.done;
+        return { ...task, done, column: done ? 'ГОТОВО' : 'Сегодня' };
+      });
       saveTasks();
       render();
+    }
+
+    function updateCounters() {
+      const completed = tasks.filter(task => task.done).length;
+      const active = tasks.length - completed;
+      const streak = Math.max(1, completed) + Math.floor(active / 3);
+
+      document.getElementById('tasksCompleted').textContent = completed;
+      document.getElementById('activeTasks').textContent = active;
+      document.getElementById('currentStreak').textContent = `${streak}d`;
+    }
+
+    function renderProgress() {
+      const list = document.getElementById('progressList');
+      list.innerHTML = '';
+      progressData.forEach(item => {
+        const row = document.createElement('div');
+        row.className = 'progress-row';
+        row.innerHTML = `
+          <div class="progress-meta"><span>${item.name}</span><span>${item.value}%</span></div>
+          <div class="progress-track"><div class="progress-fill" style="width:${item.value}%"></div></div>
+        `;
+        list.appendChild(row);
+      });
     }
 
     function filterTasks(list) {
@@ -310,9 +443,9 @@
 
       COLUMNS.forEach((columnName) => {
         const column = document.createElement('section');
-        column.className = 'column';
+        column.className = 'panel column';
 
-        const title = document.createElement('h2');
+        const title = document.createElement('h3');
         title.textContent = columnName;
         column.appendChild(title);
 
@@ -331,7 +464,6 @@
         columnTasks.forEach((task) => {
           const card = document.createElement('article');
           card.className = `task-card ${task.done ? 'task-done' : ''}`;
-
           card.innerHTML = `
             <p class="task-title">${task.title}</p>
             <div class="meta">
@@ -343,13 +475,14 @@
               <button class="delete-btn" data-action="delete" data-id="${task.id}">Удалить</button>
             </div>
           `;
-
           taskList.appendChild(card);
         });
 
         column.appendChild(taskList);
         boardEl.appendChild(column);
       });
+
+      updateCounters();
     }
 
     document.getElementById('addTaskBtn').addEventListener('click', addTask);
@@ -368,6 +501,7 @@
       if (e.target.dataset.action === 'toggle') toggleTask(e.target.dataset.id);
     });
 
+    renderProgress();
     render();
   </script>
 </body>
