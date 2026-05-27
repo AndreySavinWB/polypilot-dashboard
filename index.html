@@ -3,23 +3,19 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PolyPilot Personal Command Center v2</title>
+  <title>PolyPilot Founder OS v3</title>
   <style>
     :root {
-      --bg: #05070f;
-      --panel: rgba(11, 18, 36, 0.76);
-      --panel-2: rgba(17, 29, 56, 0.7);
-      --text: #ebf1ff;
-      --muted: #9db3dc;
-      --line: rgba(66, 101, 168, 0.45);
-      --neon-cyan: #43f0ff;
-      --neon-pink: #ff49d6;
-      --neon-lime: #b2ff3f;
-      --danger: #ff6487;
-      --ok: #5eff8f;
-      --glow-cyan: 0 0 22px rgba(67, 240, 255, 0.34);
-      --glow-pink: 0 0 24px rgba(255, 73, 214, 0.28);
-      --shadow: 0 12px 30px rgba(0, 0, 0, 0.45);
+      --bg: #030612;
+      --panel: rgba(10, 19, 42, 0.56);
+      --panel-border: rgba(95, 153, 255, 0.3);
+      --text: #ecf3ff;
+      --muted: #9eb4de;
+      --neon-cyan: #4de9ff;
+      --neon-violet: #a36cff;
+      --neon-pink: #ff5cd6;
+      --neon-lime: #b7ff58;
+      --shadow: 0 22px 60px rgba(1, 6, 20, 0.7);
     }
 
     * { box-sizing: border-box; }
@@ -29,217 +25,159 @@
       font-family: Inter, Segoe UI, Roboto, sans-serif;
       color: var(--text);
       min-height: 100vh;
-      background-color: var(--bg);
-      position: relative;
+      background: radial-gradient(circle at 12% 20%, #111f4d 0%, transparent 30%),
+                  radial-gradient(circle at 78% 18%, #221152 0%, transparent 34%),
+                  linear-gradient(130deg, #02040c 10%, #060d24 46%, #040818 100%);
       overflow-x: hidden;
+      position: relative;
     }
 
-    body::before {
-      content: "";
-      position: fixed;
-      inset: -10px;
-      background-image: url('https://images.unsplash.com/photo-1462331940025-496dfbfc7564?auto=format&fit=crop&w=2200&q=80');
-      background-size: cover;
-      background-position: center;
-      filter: blur(5px) saturate(1.1);
-      transform: scale(1.03);
-      z-index: -3;
-    }
-
-    body::after {
-      content: "";
-      position: fixed;
-      inset: 0;
-      background:
-        radial-gradient(circle at 15% 10%, rgba(67, 240, 255, 0.2), transparent 35%),
-        radial-gradient(circle at 88% 22%, rgba(255, 73, 214, 0.16), transparent 28%),
-        linear-gradient(160deg, rgba(2, 6, 15, 0.86), rgba(3, 8, 20, 0.94));
-      z-index: -2;
-    }
-
-    .scan {
+    .cyber-bg, .world-map, .particles, .scan {
       position: fixed;
       inset: 0;
       pointer-events: none;
+    }
+
+    .cyber-bg {
+      background:
+        radial-gradient(circle at 20% 10%, rgba(77, 233, 255, 0.15), transparent 34%),
+        radial-gradient(circle at 82% 18%, rgba(255, 92, 214, 0.13), transparent 30%),
+        linear-gradient(transparent 60%, rgba(55, 120, 255, 0.06) 100%);
+      animation: pulseBg 8s ease-in-out infinite alternate;
+      z-index: -4;
+    }
+
+    .world-map {
+      z-index: -3;
+      opacity: 0.34;
+      background: url('https://upload.wikimedia.org/wikipedia/commons/8/80/World_map_-_low_resolution.svg') center/130% no-repeat;
+      filter: hue-rotate(165deg) saturate(1.45) brightness(0.7) blur(0.5px) drop-shadow(0 0 24px rgba(77, 233, 255, 0.25));
+      animation: driftMap 85s linear infinite;
+      mix-blend-mode: screen;
+    }
+
+    .particles {
+      z-index: -2;
+      background-image:
+        radial-gradient(circle at 12% 25%, rgba(77, 233, 255, 0.85) 0 1px, transparent 2px),
+        radial-gradient(circle at 38% 72%, rgba(163, 108, 255, 0.85) 0 1px, transparent 2px),
+        radial-gradient(circle at 72% 33%, rgba(255, 92, 214, 0.78) 0 1px, transparent 2px),
+        radial-gradient(circle at 88% 60%, rgba(183, 255, 88, 0.8) 0 1px, transparent 2px),
+        radial-gradient(circle at 58% 18%, rgba(77, 233, 255, 0.8) 0 1px, transparent 2px),
+        radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.85) 0 1px, transparent 2px);
+      background-size: 320px 320px;
+      animation: floatParticles 22s linear infinite;
+      opacity: 0.65;
+    }
+
+    .scan {
       z-index: -1;
-      background: repeating-linear-gradient(
-        to bottom,
-        rgba(255, 255, 255, 0.015),
-        rgba(255, 255, 255, 0.015) 1px,
-        transparent 2px,
-        transparent 4px
-      );
+      background: repeating-linear-gradient(to bottom, rgba(255, 255, 255, 0.018), rgba(255, 255, 255, 0.018) 1px, transparent 2px, transparent 4px);
     }
 
     .container {
       width: min(1600px, 95vw);
       margin: 0 auto;
-      padding: 22px 18px 34px;
+      padding: 24px 18px 40px;
     }
 
     h1 {
       margin: 0;
-      font-size: clamp(1.7rem, 2.6vw, 2.45rem);
-      letter-spacing: 0.05em;
+      font-size: clamp(1.8rem, 2.8vw, 2.65rem);
+      letter-spacing: 0.07em;
       text-transform: uppercase;
       color: var(--neon-cyan);
-      text-shadow: var(--glow-cyan);
+      text-shadow: 0 0 18px rgba(77, 233, 255, 0.56);
+      animation: textGlow 3.8s ease-in-out infinite;
     }
 
-    .subtitle {
-      margin: 6px 0 18px;
-      color: var(--muted);
-      letter-spacing: 0.03em;
-    }
+    .subtitle { margin: 8px 0 20px; color: var(--muted); letter-spacing: 0.03em; }
 
     .panel {
-      background: linear-gradient(165deg, rgba(255, 255, 255, 0.04), rgba(67, 240, 255, 0.04));
-      border: 1px solid var(--line);
+      background: linear-gradient(160deg, rgba(23, 38, 78, 0.5), rgba(8, 17, 39, 0.64));
+      border: 1px solid var(--panel-border);
       border-radius: 16px;
       box-shadow: var(--shadow);
-      backdrop-filter: blur(10px);
-      transition: transform 0.28s ease, border-color 0.28s ease, box-shadow 0.28s ease;
+      backdrop-filter: blur(12px);
+      transform: translateY(0) scale(1);
+      transition: transform 0.35s cubic-bezier(.22,1,.36,1), box-shadow 0.35s ease, border-color 0.35s ease, background 0.35s ease;
+      animation: wowIn 0.8s cubic-bezier(.2,.8,.2,1) both;
     }
 
     .panel:hover {
-      transform: translateY(-2px);
-      border-color: rgba(67, 240, 255, 0.68);
-      box-shadow: var(--shadow), var(--glow-cyan);
+      transform: translateY(-4px) scale(1.005);
+      border-color: rgba(77, 233, 255, 0.78);
+      box-shadow: var(--shadow), 0 0 36px rgba(77, 233, 255, 0.28);
+      background: linear-gradient(160deg, rgba(26, 46, 96, 0.56), rgba(11, 23, 53, 0.74));
     }
 
-    .top-grid {
-      display: grid;
-      grid-template-columns: 2fr 1.2fr;
-      gap: 14px;
-      margin-bottom: 14px;
-    }
-
+    .top-grid { display: grid; grid-template-columns: 2fr 1.2fr; gap: 14px; margin-bottom: 14px; }
     .stats, .focus, .progress, .controls, .new-task { padding: 14px; }
 
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-    }
-
-    .stat-card {
-      background: var(--panel-2);
-      border: 1px solid rgba(93, 138, 224, 0.45);
-      border-radius: 12px;
-      padding: 10px;
-    }
-
+    .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    .stat-card { background: rgba(20, 38, 82, 0.62); border: 1px solid rgba(108, 156, 255, 0.36); border-radius: 12px; padding: 10px; transition: transform .25s ease; }
+    .stat-card:hover { transform: translateY(-2px); }
     .stat-label { color: var(--muted); font-size: 0.84rem; }
-    .stat-value { font-size: 1.45rem; font-weight: 700; margin-top: 3px; color: var(--neon-lime); text-shadow: 0 0 10px rgba(178,255,63,0.25); }
+    .stat-value { font-size: 1.45rem; font-weight: 700; margin-top: 3px; color: var(--neon-lime); text-shadow: 0 0 12px rgba(183,255,88,0.32); }
 
-    h2 { margin: 0 0 10px; font-size: 1rem; letter-spacing: 0.06em; color: #e4ecff; text-transform: uppercase; }
-
+    h2 { margin: 0 0 10px; font-size: 1rem; letter-spacing: 0.06em; color: #ebf3ff; text-transform: uppercase; }
     .focus ul { margin: 0; padding-left: 18px; color: #e7efff; }
     .focus li { margin: 6px 0; }
 
     .progress-row { margin-bottom: 10px; }
-    .progress-meta { display: flex; justify-content: space-between; font-size: 0.82rem; color: var(--muted); margin-bottom: 5px; }
-    .progress-track {
-      width: 100%;
-      height: 10px;
-      border-radius: 999px;
-      background: rgba(31, 45, 80, 0.75);
-      border: 1px solid rgba(96, 133, 198, 0.35);
-      overflow: hidden;
-    }
-    .progress-fill {
-      height: 100%;
-      border-radius: 999px;
-      background: linear-gradient(90deg, var(--neon-cyan), var(--neon-pink));
-      box-shadow: var(--glow-pink);
-      transition: width 0.5s ease;
-    }
+    .progress-meta { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; font-size: 0.82rem; color: var(--muted); margin-bottom: 5px; }
+    .progress-track { width: 100%; height: 11px; border-radius: 999px; background: rgba(19, 34, 74, 0.78); border: 1px solid rgba(108, 150, 234, 0.3); overflow: hidden; }
+    .progress-fill { height: 100%; border-radius: 999px; background: linear-gradient(90deg, var(--neon-cyan), var(--neon-violet), var(--neon-pink)); box-shadow: 0 0 24px rgba(163, 108, 255, 0.4); transition: width .7s ease; }
 
-    .controls-wrap {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 14px;
-      margin-bottom: 14px;
-    }
-
+    .controls-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
     .controls { display: grid; grid-template-columns: repeat(2, minmax(180px, 260px)); gap: 10px; }
-    .new-task {
-      display: grid;
-      grid-template-columns: 2fr 1fr 1fr 1fr auto;
-      gap: 10px;
-      align-items: end;
-    }
+    .new-task { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr auto; gap: 10px; align-items: end; }
 
-    label { font-size: 0.82rem; color: var(--muted); display: block; margin-bottom: 4px; }
-    input, select, button {
-      width: 100%;
-      background: rgba(16, 27, 52, 0.88);
-      color: var(--text);
-      border: 1px solid rgba(83, 124, 196, 0.5);
-      border-radius: 10px;
-      padding: 10px 12px;
-    }
-    input:focus, select:focus {
-      outline: none;
-      border-color: var(--neon-cyan);
-      box-shadow: 0 0 0 3px rgba(67, 240, 255, 0.16);
-    }
-    button {
-      cursor: pointer;
-      font-weight: 600;
-      background: linear-gradient(140deg, rgba(67, 240, 255, 0.2), rgba(255, 73, 214, 0.2));
-      transition: all 0.22s ease;
-    }
-    button:hover { transform: translateY(-1px) scale(1.01); box-shadow: var(--glow-pink); }
+    label { font-size: .82rem; color: var(--muted); display: block; margin-bottom: 4px; }
+    input, select, button { width: 100%; background: rgba(15, 29, 63, .88); color: var(--text); border: 1px solid rgba(99, 143, 226, .5); border-radius: 10px; padding: 10px 12px; transition: border-color .22s ease, box-shadow .22s ease, transform .22s ease; }
+    input:focus, select:focus { outline: none; border-color: var(--neon-cyan); box-shadow: 0 0 0 3px rgba(77, 233, 255, 0.16); }
+    button { cursor: pointer; font-weight: 600; background: linear-gradient(140deg, rgba(77, 233, 255, 0.22), rgba(255, 92, 214, 0.2)); }
+    button:hover { transform: translateY(-2px) scale(1.01); box-shadow: 0 0 22px rgba(255, 92, 214, 0.3); }
 
-    .board {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(240px, 1fr));
-      gap: 12px;
-    }
-
+    .board { display: grid; grid-template-columns: repeat(4, minmax(240px, 1fr)); gap: 12px; }
     .column { padding: 12px; }
     .column h3 { margin: 4px 0 12px; color: var(--neon-lime); letter-spacing: 0.03em; }
     .task-list { display: grid; gap: 10px; }
+    .task-card { background: var(--panel); border: 1px solid rgba(92, 136, 214, .45); border-radius: 12px; padding: 10px; display: grid; gap: 8px; transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease; }
+    .task-card:hover { border-color: rgba(77, 233, 255, .85); box-shadow: 0 0 24px rgba(77, 233, 255, .26); transform: translateY(-2px); }
+    .task-title { margin: 0; font-size: .95rem; }
+    .task-done .task-title { text-decoration: line-through; opacity: .66; }
+    .meta { display: flex; gap: 6px; flex-wrap: wrap; font-size: .77rem; }
+    .badge { padding: 2px 8px; border-radius: 999px; border: 1px solid rgba(95, 140, 218, .6); background: rgba(20, 34, 66, .86); color: #cce2ff; }
+    .actions { display: flex; justify-content: space-between; align-items: center; gap: 8px; font-size: .84rem; }
+    .delete-btn { width: auto; padding: 6px 10px; border-color: rgba(255, 100, 135, .7); background: rgba(255, 100, 135, .12); color: #ffd8e2; }
+    .empty { color: #7389b5; font-size: .9rem; }
 
-    .task-card {
-      background: var(--panel);
-      border: 1px solid rgba(83, 124, 196, 0.48);
-      border-radius: 12px;
-      padding: 10px;
-      display: grid;
-      gap: 8px;
-      transition: all 0.24s ease;
-    }
-    .task-card:hover { border-color: rgba(67, 240, 255, 0.85); box-shadow: var(--glow-cyan); transform: translateY(-1px); }
-    .task-title { margin: 0; font-size: 0.95rem; }
-    .task-done .task-title { text-decoration: line-through; opacity: 0.66; }
-    .meta { display: flex; gap: 6px; flex-wrap: wrap; font-size: 0.77rem; }
-    .badge { padding: 2px 8px; border-radius: 999px; border: 1px solid rgba(95, 140, 218, 0.6); background: rgba(20, 34, 66, 0.86); color: #cce2ff; }
-    .actions { display: flex; justify-content: space-between; align-items: center; gap: 8px; font-size: 0.84rem; }
-    .delete-btn { width: auto; padding: 6px 10px; border-color: rgba(255, 100, 135, 0.7); background: rgba(255, 100, 135, 0.12); color: #ffd8e2; }
-    .empty { color: #7389b5; font-size: 0.9rem; }
+    @keyframes wowIn { from { opacity: 0; transform: translateY(10px) scale(.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+    @keyframes driftMap { 0% { transform: translateX(-2.5%) scale(1.06); } 50% { transform: translateX(2.5%) scale(1.09); } 100% { transform: translateX(-2.5%) scale(1.06); } }
+    @keyframes floatParticles { from { transform: translateY(0); } to { transform: translateY(-160px); } }
+    @keyframes pulseBg { from { opacity: .84; } to { opacity: 1; } }
+    @keyframes textGlow { 0%,100% { text-shadow: 0 0 16px rgba(77, 233, 255, 0.48); } 50% { text-shadow: 0 0 26px rgba(77, 233, 255, 0.72); } }
 
     @media (max-width: 1280px) {
-      .top-grid { grid-template-columns: 1fr; }
-      .controls-wrap { grid-template-columns: 1fr; }
+      .top-grid, .controls-wrap { grid-template-columns: 1fr; }
       .new-task { grid-template-columns: 1fr 1fr; }
       .new-task .wide { grid-column: span 2; }
       .board { grid-template-columns: repeat(2, 1fr); }
     }
-
     @media (max-width: 860px) {
-      .stats-grid { grid-template-columns: 1fr; }
-      .controls { grid-template-columns: 1fr; }
-      .board { grid-template-columns: 1fr; }
+      .stats-grid, .controls, .board { grid-template-columns: 1fr; }
     }
   </style>
 </head>
 <body>
+  <div class="cyber-bg"></div>
+  <div class="world-map"></div>
+  <div class="particles"></div>
   <div class="scan"></div>
   <div class="container">
-    <h1>PolyPilot Personal Command Center v2</h1>
-    <p class="subtitle">AI Terminal • Cyberpunk • Desktop Operating System</p>
+    <h1>PolyPilot Founder Operating System v3</h1>
+    <p class="subtitle">Premium Founder Stack • Cyberpunk Mission Control • Daily Execution Engine</p>
 
     <section class="top-grid">
       <div class="panel stats">
@@ -256,13 +194,13 @@
           <li>1 ролик</li>
           <li>30 мин AI</li>
           <li>1 идея</li>
-          <li>1 улучшение dashboard</li>
+          <li>1 upgrade dashboard</li>
         </ul>
       </div>
     </section>
 
     <section class="panel progress" id="progressBlock">
-      <h2>50-дневный спринт до MVP</h2>
+      <h2>50-дневный challenge до MVP</h2>
       <div id="progressList"></div>
     </section>
 
@@ -270,58 +208,19 @@
       <div class="panel controls">
         <div>
           <label for="categoryFilter">Фильтр по категории</label>
-          <select id="categoryFilter">
-            <option value="all">Все категории</option>
-            <option value="Разработка">Разработка</option>
-            <option value="Дизайн">Дизайн</option>
-            <option value="Маркетинг">Маркетинг</option>
-            <option value="Операционка">Операционка</option>
-          </select>
+          <select id="categoryFilter"><option value="all">Все категории</option><option value="Разработка">Разработка</option><option value="Дизайн">Дизайн</option><option value="Маркетинг">Маркетинг</option><option value="Операционка">Операционка</option></select>
         </div>
         <div>
           <label for="priorityFilter">Фильтр по приоритету</label>
-          <select id="priorityFilter">
-            <option value="all">Все приоритеты</option>
-            <option value="высокий">Высокий</option>
-            <option value="средний">Средний</option>
-            <option value="низкий">Низкий</option>
-          </select>
+          <select id="priorityFilter"><option value="all">Все приоритеты</option><option value="высокий">Высокий</option><option value="средний">Средний</option><option value="низкий">Низкий</option></select>
         </div>
       </div>
-
       <div class="panel new-task">
-        <div class="wide">
-          <label for="taskTitle">Задача</label>
-          <input id="taskTitle" placeholder="Введите задачу" />
-        </div>
-        <div>
-          <label for="taskCategory">Категория</label>
-          <select id="taskCategory">
-            <option value="Разработка">Разработка</option>
-            <option value="Дизайн">Дизайн</option>
-            <option value="Маркетинг">Маркетинг</option>
-            <option value="Операционка">Операционка</option>
-          </select>
-        </div>
-        <div>
-          <label for="taskPriority">Приоритет</label>
-          <select id="taskPriority">
-            <option value="высокий">Высокий</option>
-            <option value="средний" selected>Средний</option>
-            <option value="низкий">Низкий</option>
-          </select>
-        </div>
-        <div>
-          <label for="taskColumn">Колонка</label>
-          <select id="taskColumn">
-            <option value="Сегодня">Сегодня</option>
-            <option value="Неделя">Неделя</option>
-            <option value="Когда-нибудь потом">Когда-нибудь потом</option>
-          </select>
-        </div>
-        <div>
-          <button id="addTaskBtn">Добавить</button>
-        </div>
+        <div class="wide"><label for="taskTitle">Задача</label><input id="taskTitle" placeholder="Введите задачу" /></div>
+        <div><label for="taskCategory">Категория</label><select id="taskCategory"><option value="Разработка">Разработка</option><option value="Дизайн">Дизайн</option><option value="Маркетинг">Маркетинг</option><option value="Операционка">Операционка</option></select></div>
+        <div><label for="taskPriority">Приоритет</label><select id="taskPriority"><option value="высокий">Высокий</option><option value="средний" selected>Средний</option><option value="низкий">Низкий</option></select></div>
+        <div><label for="taskColumn">Колонка</label><select id="taskColumn"><option value="Сегодня">Сегодня</option><option value="Неделя">Неделя</option><option value="Когда-нибудь потом">Когда-нибудь потом</option></select></div>
+        <div><button id="addTaskBtn">Добавить</button></div>
       </div>
     </div>
 
@@ -329,8 +228,9 @@
   </div>
 
   <script>
-    const STORAGE_KEY = 'polypilot-dashboard-v2';
+    const STORAGE_KEY = 'polypilot-dashboard-v3';
     const COLUMNS = ['Сегодня', 'Неделя', 'Когда-нибудь потом', 'ГОТОВО'];
+    const SPRINT_DAYS = 50;
 
     const starterTasks = [
       { title: 'Поднять первую версию MVP-экрана', category: 'Разработка', priority: 'высокий', done: false, column: 'Сегодня', completedAt: null },
@@ -338,12 +238,10 @@
       { title: 'Записать гипотезу value proposition', category: 'Маркетинг', priority: 'средний', done: false, column: 'Неделя', completedAt: null },
       { title: 'Обновить backlog спринта', category: 'Операционка', priority: 'низкий', done: false, column: 'Когда-нибудь потом', completedAt: null }
     ];
-    const SPRINT_DAYS = 50;
 
     const boardEl = document.getElementById('board');
     const categoryFilterEl = document.getElementById('categoryFilter');
     const priorityFilterEl = document.getElementById('priorityFilter');
-
     let tasks = loadTasks();
 
     function loadTasks() {
@@ -353,16 +251,12 @@
         localStorage.setItem(STORAGE_KEY, JSON.stringify(initial));
         return initial;
       }
-      try {
-        return JSON.parse(saved).map(normalizeTask);
-      } catch {
-        return [];
-      }
+      try { return JSON.parse(saved).map(normalizeTask); } catch { return []; }
     }
 
-    function saveTasks() {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
-    }
+    function saveTasks() { localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks)); }
+    function normalizeTask(task) { return { ...task, completedAt: task.completedAt ?? null }; }
+    function getDateKey(dateInput) { return new Date(dateInput).toISOString().slice(0, 10); }
 
     function addTask() {
       const title = document.getElementById('taskTitle').value.trim();
@@ -370,19 +264,13 @@
       const priority = document.getElementById('taskPriority').value;
       const column = document.getElementById('taskColumn').value;
       if (!title) return;
-
       tasks.unshift({ id: crypto.randomUUID(), title, category, priority, done: false, column, completedAt: null });
       saveTasks();
       render();
       document.getElementById('taskTitle').value = '';
     }
 
-    function deleteTask(id) {
-      tasks = tasks.filter(task => task.id !== id);
-      saveTasks();
-      render();
-    }
-
+    function deleteTask(id) { tasks = tasks.filter(task => task.id !== id); saveTasks(); render(); }
     function toggleTask(id) {
       tasks = tasks.map(task => {
         if (task.id !== id) return task;
@@ -393,11 +281,24 @@
       render();
     }
 
+    function getActiveDays() { return [...new Set(tasks.filter(task => task.done && task.completedAt).map(task => getDateKey(task.completedAt)))].sort(); }
+
+    function getCurrentStreak() {
+      const daySet = new Set(getActiveDays());
+      let streak = 0;
+      const cursor = new Date();
+      cursor.setUTCHours(0, 0, 0, 0);
+      while (daySet.has(cursor.toISOString().slice(0, 10))) {
+        streak += 1;
+        cursor.setUTCDate(cursor.getUTCDate() - 1);
+      }
+      return streak;
+    }
+
     function updateCounters() {
       const completed = tasks.filter(task => task.done).length;
       const active = tasks.length - completed;
       const streak = getCurrentStreak();
-
       document.getElementById('tasksCompleted').textContent = completed;
       document.getElementById('activeTasks').textContent = active;
       document.getElementById('currentStreak').textContent = `${streak}d`;
@@ -406,11 +307,18 @@
     function renderProgress() {
       const list = document.getElementById('progressList');
       const activeDays = getActiveDays();
-      const dayNumber = Math.max(1, Math.min(SPRINT_DAYS, activeDays.length));
-      const daysLeft = Math.max(0, SPRINT_DAYS - dayNumber);
+      const startedAt = activeDays[0] ? new Date(`${activeDays[0]}T00:00:00Z`) : new Date();
+      startedAt.setUTCHours(0, 0, 0, 0);
+      const now = new Date();
+      now.setUTCHours(0, 0, 0, 0);
+      const elapsed = Math.floor((now - startedAt) / 86400000) + 1;
+      const dayNumber = Math.max(1, Math.min(SPRINT_DAYS, elapsed));
       const progressPercent = Math.round((dayNumber / SPRINT_DAYS) * 100);
-      const completedTasks = tasks.filter(task => task.done).length;
+      const daysLeft = Math.max(0, SPRINT_DAYS - dayNumber);
       const streak = getCurrentStreak();
+      const eta = new Date(startedAt);
+      eta.setUTCDate(eta.getUTCDate() + SPRINT_DAYS - 1);
+      const etaLabel = eta.toLocaleDateString('ru-RU', { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' });
 
       list.innerHTML = `
         <div class="progress-row">
@@ -418,94 +326,44 @@
           <div class="progress-track"><div class="progress-fill" style="width:${progressPercent}%"></div></div>
         </div>
         <div class="progress-meta"><span>Осталось ${daysLeft} дней</span><span>Текущий streak: ${streak}d</span></div>
-        <div class="progress-meta"><span>Всего выполнено задач: ${completedTasks}</span></div>
-        <p style="margin:10px 0 0;color:var(--muted);font-size:0.85rem;">Цель: 50 дней подряд двигать PolyPilot к MVP. Не идеально. Ежедневно.</p>
+        <div class="progress-meta"><span>Estimated completion</span><span>${etaLabel}</span></div>
+        <p style="margin:10px 0 0;color:var(--muted);font-size:0.85rem;">50 дней дисциплины: маленькие шаги каждый день, системно и без откатов.</p>
       `;
-    }
-
-    function normalizeTask(task) {
-      return {
-        ...task,
-        completedAt: task.completedAt ?? null
-      };
-    }
-
-    function getDateKey(dateInput) {
-      return new Date(dateInput).toISOString().slice(0, 10);
-    }
-
-    function getActiveDays() {
-      return [...new Set(tasks.filter(task => task.done && task.completedAt).map(task => getDateKey(task.completedAt)))].sort();
-    }
-
-    function getCurrentStreak() {
-      const daySet = new Set(getActiveDays());
-      let streak = 0;
-      const cursor = new Date();
-      cursor.setUTCHours(0, 0, 0, 0);
-
-      while (daySet.has(cursor.toISOString().slice(0, 10))) {
-        streak += 1;
-        cursor.setUTCDate(cursor.getUTCDate() - 1);
-      }
-      return streak;
     }
 
     function filterTasks(list) {
       const categoryFilter = categoryFilterEl.value;
       const priorityFilter = priorityFilterEl.value;
-      return list.filter(task => {
-        const categoryOk = categoryFilter === 'all' || task.category === categoryFilter;
-        const priorityOk = priorityFilter === 'all' || task.priority === priorityFilter;
-        return categoryOk && priorityOk;
-      });
+      return list.filter(task => (categoryFilter === 'all' || task.category === categoryFilter) && (priorityFilter === 'all' || task.priority === priorityFilter));
     }
 
     function render() {
       boardEl.innerHTML = '';
       const visible = filterTasks(tasks);
-
       COLUMNS.forEach((columnName) => {
         const column = document.createElement('section');
         column.className = 'panel column';
-
         const title = document.createElement('h3');
         title.textContent = columnName;
         column.appendChild(title);
-
         const taskList = document.createElement('div');
         taskList.className = 'task-list';
-
         const columnTasks = visible.filter(task => task.column === columnName);
-
         if (!columnTasks.length) {
           const empty = document.createElement('div');
           empty.className = 'empty';
           empty.textContent = 'Нет задач';
           taskList.appendChild(empty);
         }
-
         columnTasks.forEach((task) => {
           const card = document.createElement('article');
           card.className = `task-card ${task.done ? 'task-done' : ''}`;
-          card.innerHTML = `
-            <p class="task-title">${task.title}</p>
-            <div class="meta">
-              <span class="badge">${task.category}</span>
-              <span class="badge">${task.priority}</span>
-            </div>
-            <div class="actions">
-              <label><input type="checkbox" data-action="toggle" data-id="${task.id}" ${task.done ? 'checked' : ''}> готово</label>
-              <button class="delete-btn" data-action="delete" data-id="${task.id}">Удалить</button>
-            </div>
-          `;
+          card.innerHTML = `<p class="task-title">${task.title}</p><div class="meta"><span class="badge">${task.category}</span><span class="badge">${task.priority}</span></div><div class="actions"><label><input type="checkbox" data-action="toggle" data-id="${task.id}" ${task.done ? 'checked' : ''}> готово</label><button class="delete-btn" data-action="delete" data-id="${task.id}">Удалить</button></div>`;
           taskList.appendChild(card);
         });
-
         column.appendChild(taskList);
         boardEl.appendChild(column);
       });
-
       updateCounters();
       renderProgress();
     }
